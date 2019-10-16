@@ -1,0 +1,396 @@
+# Reading the data from the csv file
+eData <- read.csv(file = file.choose())
+
+#checking the class of the dataset
+class(eData)
+
+#checking the class of the variables using sapply
+sapply(eData[1,], class)
+unique(eData)
+
+#checking the length of the unique vlaues of varaible class
+length(unique(eData$Class))
+
+#doing the same with variable time and amount
+unique(eData$Time)
+length(unique(eData$Time))
+unique(eData$Amount)
+length(unique(eData$Amount))
+
+#checking the relation between amount and class variable
+table(eData$Class, eData$Amount)
+
+#checking the relation between amount and class variable
+table(eData$Class[1:300], eData$Amount[1:300])
+
+#checking if their is any wrong value in class variable
+any(eData$Class[] > 1 || eData$Class[] < 0)
+
+#checking for any missing values in class variable
+is.na(any(eData$class))
+
+#subsetting the class variable
+eData[eData$Class[] == 0 & eData$Class[] == 1, c("legit", "fruad")]
+
+#checking if we have missing values in our entire dataset
+is.na(any(eData))
+
+fruad
+
+# Exploratory analysis
+# taking a look at the entire data set
+eData
+
+# summarizing the data
+# checking the column names of the data
+colnames(eData)
+
+# checking the number of rows
+nrow(eData)
+
+# checking the dimensions of the data
+dim(eData)
+summary(eData)
+
+# usnig quantile to check the summary of individual variables
+# it aslo gives us an overview of the variables
+quantile(eData$Time)
+quantile(eData$Class)
+quantile(eData$Amount)
+
+# checking the class of the variables using sapply
+# seleting the first row and applying class function to the variables of
+# first row using sapply
+
+sapply(eData[1,], class)
+# checking the unique values of the Class variables
+unique(eData$Class)
+
+# checking the length of the unique vlaues of varaible class
+length(unique(eData$Class))
+
+# doing the same with variable time and amount
+unique(eData$Time)
+length(unique(eData$Time))
+unique(eData$Amount)
+length(unique(eData$Amount))
+
+# table listed all the unique variables and the number of times it appeared
+table(eData$Class)
+
+# here we have only 492 positive or fruads in the entire dataset
+# as the dataset is the dependent variable
+# checking the relation between first 300 observation
+# of amount and class variable
+table(eData$Class[1:300], eData$Amount[1:300])
+# it shows the number of time a particular amount has been debited
+# by the customers
+
+# checking if their is any wrong value in class variable
+any(eData$Class[] > 1 | eData$Class[] < 0)
+
+# checking for any missing values in class variable
+is.na(any(eData$class))
+# we have got no missing values in the Class variable which is a
+# good thing
+
+
+head(eData, 2)
+#checking if we have missing values in our entire dataset
+is.na(any(eData))
+
+# summarizing the data
+# checking the column names of the data
+colnames(eData)
+
+# data munging
+split.screen(plot(eData$Time, eData$V1))
+
+# data munging
+eData$Amount[1:10]
+
+
+
+
+# making a quantative variable
+Ranges <- cut(eData$Time, seq(0, 4000, by = 200))
+Ranges
+
+summary(eData$Amount) 
+which(is.na(eData$Amount))
+
+any(is.na(eData$Amount))
+
+
+# Exploratory graphs
+# Checking the data distribution using box plot
+boxplot(eData$Class, col = "navy")
+# here the box plot shows that most of the transactions are legit
+ 
+ 
+boxplot(eData$Amount, col = "navy") 
+# most of the transactions were between 0 to 10000
+ 
+boxplot(eData$Time, col = "navy")
+# shit happens but we see that data is not symmetric
+ 
+# comparing different variables 
+boxplot(eData$Amount ~ eData$Class, col = "red1",)
+boxplot(eData$V2 ~ eData$Class, col = "red1")
+ 
+boxplot(eData$V2 ~ eData$Class, col = c("red1", "navy"),
+        names = c("legit", "fruad"), varwidth = T) 
+ 
+# checking the frequency of data
+barplot(table(eData$Time), col = "blue")
+barplot(table(eData$Class), col = "blue")
+barplot(table(eData$Amount), col = "red4")
+barplot(table(eData$V11), col = "red4")
+hist(table(eData$V11, eData$Class), col = "maroon")
+
+# visualizing relation between different variable using scatterplot
+plot(eData$Class, eData$Amount, pch = 10, col = "tomato3")
+# well the theifs were cheap
+
+titi <- which(eData$Class > 0)
+
+boxplot(titi, eData$Time, pch = 10, col = "tomato3", cex = 0.5, nnames = c("titi", "time"))
+plot(eData$Class, eData$Time, pch = 10, col = "tomato3")
+plot(titi, eData$Time, pch = 10, col = "tomato3")
+
+#subsetting 
+samplee <- sample(eData$Time, size = 1000, replace = F)
+samplee1 <- sample(eData$Class, size = 1000, replace = F)
+plot(samplee, samplee1, pch = 10, col = "tomato3")
+smoothScatter(samplee, samplee1)
+# well the time variable is all over the places so i think it sucks
+
+
+# plotting variables side by side
+par(mfrow = c(1,2))
+hist(eData$V11, col = "blue")
+hist(eData$V12,col = "blue")
+
+par(mfrow = c(1, 2))
+hist(eData$Class, col = "navy")
+hist(eData$V13)
+
+par(mfrow = c(1,2))
+hist(eData$V11, col = "blue")
+hist(eData$V13,col = "blue")
+
+
+
+library(Rtsne)
+set <- 1:as.integer((0.1* nrow(traint)))
+#setting preplexity = 40
+tsne <- Rtsne(traint[set,-c(1, 31)], perplexity = 40, theta = 0.5,
+              pca = F, verbose = T, max_iter = 500, check_duplicates = F)
+
+class <- as.factor(traint$Class[set])
+mt <- as.data.frame(tsne$Y)
+
+#visualising transaction of tsne
+
+ggplot(mt, aes(x = set, y = V2)) +
+        geom_point(aes(color = class)) +
+        theme_minimal() +
+        ggtitle("Transaction VIsualiasation")
+
+ggplot(mt, aes(x = V1, y = V2)) +
+        geom_point(aes(color = class)) +
+        theme_minimal() +
+        ggtitle("Transaction VIsualiasation")
+
+
+
+
+
+
+
+# Checking the correlation of the variables
+library(corrplot)
+
+cor.test(eData$Amount, eData$Class, method = "pearson")
+cor.test(eData$V11, eData$Class, method = "pearson")
+cor.test(eData$V1, eData$Class, method = "spearman", alt = "greater", exact = F)
+cor.test(eData$Time, eData$Class, method = "spearman", alt = "greater", exact = F)
+testt <- as.data.frame(eData$Class)
+testt1 <- as.data.frame(eData$V11)
+corrplot(cor(testt, testt1), method = "square", type = "full", bg = "maroon")
+corrplot(cor(eData[,-c(1)]), method = "square", type = "full", bg = "steelblue2")
+
+
+
+
+# using k means clustering
+# that is we fix a number of clusters
+# get "centroids of each cluster
+# Assign things to closest centroid
+# recalculate centroids
+
+kmeansobject <- kmeans(eData, centers = 3)
+names(kmeansobject)
+summary(kmeansobject$cluster)
+
+hist(kmeansobject$cluster)
+
+hist(kmeansobject$totss)
+
+hist(kmeansobject$size)
+
+hist(kmeansobject$withinss)
+
+hist(kmeansobject$betweenss)
+
+plot(kmeansobject$centers, col = "red")
+
+
+
+# scaling to structure data to a specific range. so we exterminate
+# extreme values that ight interfere with our model
+
+eData$Amount = scale(eData$Amount)
+eData$Amount
+
+# removing time variable as it sucks 
+dataf <- eData[-c(1)]
+
+
+# siplitting our data into training and test set
+# 80% of the whole data will be train data 
+# 20% will be test data 
+
+library(caTools)
+set.seed(321)
+data_sample <- sample.split(dataf$Class, SplitRatio = 0.80)
+traint <- subset(dataf, data_sample == T)
+testd <- subset(dataf, data_sample == F)
+
+dim(traint)
+dim(testd)
+
+library(caret)
+
+# using logistic regression
+library(glmnet)
+lm <- glm(Class ~., testd, family = binomial('logit'), maxit = 100)
+summary(lm)
+
+plot(lm)
+
+
+# to increase the performance of our model we delineate ROC curve 
+# roc <- Reciever Optimistic Characteristics 
+library(pROC) 
+pre <- predict(lm, traint, probability = T)
+gbm = roc(testd$Class, pre, plot = TRUE, col = "blue")
+
+
+
+
+library(rpart)
+library(rpart.plot)
+decisionTree_model <- rpart(traint$Class ~ . ,testd , method = 'class')
+predicted_val <- predict(decisionTree_model, dataf, type = 'class')
+probability <- predict(decisionTree_model, dataf, type = 'prob')
+rpart.plot(decisionTree_model)
+
+
+
+
+
+
+md3 <- glm(formula = Class ~ ., famly = "binomial", data = train1)
+
+#using threshhold 0.5 to change prediction in binary
+#increase threshhold to adjust 
+
+mat <- confusionMatrix(test2, as.numeric(predict(md, test1, type = "response") > 0.5))
+mat
+
+library(doSNOW)
+cl <- makeCluster(6, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+ct <- trainControl(method = "cv",
+                   number = 20,
+                   verboseIter = T,
+                   classProbs = T,
+                   sampling = "smote",
+                   summaryFunction = twoClassSummary,
+                   savePredictions = T)
+
+# developing artificial neural nets
+library(neuralnet)
+
+# creating ANN model with 10 neurons
+md1 <- neuralnet(formula = Class ~ ., traint, hidden = 10, threshold = 0.05)
+md1
+plot(md1)
+# testing the model
+
+predict <- compute(md1, testd)
+predict$net.result
+summary(predict)
+predict$neurons
+summary(predict$net.result)
+predict$net.result.matrix
+
+results <- data.frame(actual = testd, prediction = predict$net.result)
+results
+prob <- predict$net.result
+pred <- ifelse(prob>0.5, 1, 0)
+pred
+
+
+library(readr)
+library(dplyr)
+
+library(Hmisc)
+library(party)
+
+# using random forest to check which variable is important
+
+set.seed(1111)
+eData$class <- factor(eData$Class)
+train1 <- eData[1:150000, ]
+test <- eData[150001:280000, ]
+library(randomForest)
+rfModel <- randomForest(Class ~ ., data = train1)
+
+test$predicted <- predict(rfModel, test)
+summary(test$predicted)
+summary(test$class)
+
+conf <- confusionMatrix(test$class, test$predicted)
+
+# using neural net to make perfected model
+set.seed(0311)
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+                 V11 + V9 + V4 + V18 + V26, data = traint, hidden = c(20 ,5), threshold = 0.5)
+plot(nn)
+
+
+predicttt <- compute(nn, testd)
+predicttt$net.result
+
+summary(predicttt$net.result)
+result <- predicttt$net.result
+result <- ifelse(result > 0.5, 1, 0)
+result
+
+prob <- predicttt$net.result
+pred <- ifelse(prob>0.5, 1, 0)
+pred
+
+set <-1:as.integer((0.1* nrow(fruad)))
+#removing variable time and class
+tss <- eData[set, (-1)]
+tsss <- tss[set, -c(30, 31)]
+
+final <- predict(nn, tsss)
+final1 <- compute(nn, tsss)
+confusionMatrix(tsss, set)
+
+
