@@ -1,0 +1,512 @@
+# usnig quantile to check the summary of individual variables
+# it aslo gives us an overview of the variables
+quantile(eData$Time)
+quantile(eData$Class)
+quantile(eData$Amount)
+# checking the class of the variables using sapply
+# seleting the first row and applying class function to the variables of
+# first row using sapply
+sapply(eData[1,], class)
+# checking the unique values of the Class variables
+unique(eData$Class)
+# checking the length of the unique vlaues of varaible class
+length(unique(eData$Class))
+# doing the same with variable time and amount
+unique(eData$Time)
+length(unique(eData$Time))
+unique(eData$Amount)
+length(unique(eData$Amount))
+# table listed all the unique variables and the number of times it appeared
+table(eData$Class)
+# here we have only 492 positive or fruads in the entire dataset
+# as the dataset is the dependent variable
+# checking the relation between first 300 observation
+# of amount and class variable
+table(eData$Class[1:300], eData$Amount[1:300])
+# it shows the number of time a particular amount has been debited
+# by the customers
+# checking if their is any wrong value in class variable
+any(eData$Class[] > 1 | eData$Class[] < 0)
+# checking for any missing values in class variable
+is.na(any(eData$class))
+# we have got no missing values in the Class variable which is a
+# good thing
+head(eData, 2)
+#checking if we have missing values in our entire dataset
+is.na(any(eData))
+# summarizing the data
+# checking the column names of the data
+colnames(eData)
+# data munging
+split.screen(plot(eData$Time, eData$V1))
+# data munging
+eData$Amount[1:10]
+# making a quantative variable
+Ranges <- cut(eData$Time, seq(0, 4000, by = 200))
+Ranges
+summary(eData$Amount)
+which(is.na(eData$Amount))
+any(is.na(eData$Amount))
+# Exploratory graphs
+# Checking the data distribution using box plot
+boxplot(eData$Class, col = "navy")
+# here the box plot shows that most of the transactions are legit
+boxplot(eData$Amount, col = "navy")
+# most of the transactions were between 0 to 10000
+boxplot(eData$Time, col = "navy")
+# shit happens but we see that data is not symmetric
+# comparing different variables
+boxplot(eData$Amount ~ eData$Class, col = "red1",)
+boxplot(eData$V2 ~ eData$Class, col = "red1")
+boxplot(eData$V2 ~ eData$Class, col = c("red1", "navy"),
+names = c("legit", "fruad"), varwidth = T)
+# checking the frequency of data
+barplot(table(eData$Time), col = "blue")
+barplot(table(eData$Class), col = "blue")
+barplot(table(eData$Amount), col = "red4")
+barplot(table(eData$V11), col = "red4")
+hist(table(eData$V11, eData$Class), col = "maroon")
+# visualizing relation between different variable using scatterplot
+plot(eData$Class, eData$Amount, pch = 10, col = "tomato3")
+# well the theifs were cheap
+titi <- which(eData$Class > 0)
+boxplot(titi, eData$Time, pch = 10, col = "tomato3", cex = 0.5, nnames = c("titi", "time"))
+plot(eData$Class, eData$Time, pch = 10, col = "tomato3")
+plot(titi, eData$Time, pch = 10, col = "tomato3")
+#subsetting
+samplee <- sample(eData$Time, size = 1000, replace = F)
+samplee1 <- sample(eData$Class, size = 1000, replace = F)
+plot(samplee, samplee1, pch = 10, col = "tomato3")
+smoothScatter(samplee, samplee1)
+# well the time variable is all over the places so i think it sucks
+# plotting variables side by side
+par(mfrow = c(1,2))
+hist(eData$V11, col = "blue")
+hist(eData$V12,col = "blue")
+par(mfrow = c(1, 2))
+hist(eData$Class, col = "navy")
+hist(eData$V13)
+par(mfrow = c(1,2))
+hist(eData$V11, col = "blue")
+hist(eData$V13,col = "blue")
+library(ggplot2)
+# Checking the correlation of the variables
+library(corrplot)
+cor.test(eData$Amount, eData$Class, method = "pearson")
+cor.test(eData$V11, eData$Class, method = "pearson")
+cor.test(eData$V1, eData$Class, method = "spearman", alt = "greater", exact = F)
+cor.test(eData$Time, eData$Class, method = "spearman", alt = "greater", exact = F)
+testt <- as.data.frame(eData$Class)
+testt1 <- as.data.frame(eData$V11)
+corrplot(cor(testt, testt1), method = "square", type = "full", bg = "maroon")
+corrplot(cor(eData[,-c(1)]), method = "square", type = "full", bg = "steelblue2")
+# using k means clustering
+# that is we fix a number of clusters
+# get "centroids of each cluster
+# Assign things to closest centroid
+# recalculate centroids
+kmeansobject <- kmeans(eData, centers = 3)
+names(kmeansobject)
+summary(kmeansobject$cluster)
+hist(kmeansobject$cluster)
+hist(kmeansobject$totss)
+hist(kmeansobject$size)
+hist(kmeansobject$withinss)
+hist(kmeansobject$betweenss)
+plot(kmeansobject$centers, col = "red")
+# scaling to structure data to a specific range. so we exterminate
+# extreme values that ight interfere with our model
+eData$Amount = scale(eData$Amount)
+eData$Amount
+# removing time variable as it sucks
+dataf <- eData[-c(1)]
+library(neuralnet)
+md1 <- neuralnet(formula = Class ~ ., traint, hidden = 10, threshold = 0.05)
+md1
+mat2 <- confusionMatrix(test2, as.numeric(predict(md1, testd, type = "response") > 0.5))
+library(doSNOW)
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+cl <- makeCluster(8, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+ct <- trainControl(method = "cv",
+number = 20,
+verboseIter = T,
+classProbs = T,
+sampling = "smote",
+summaryFunction = twoClassSummary,
+savePredictions = T)
+ct <- trainControl(method = "cv",
+number = 20,
+verboseIter = T,
+classProbs = T,
+sampling = "smote",
+summaryFunction = twoClassSummary,
+savePredictions = T)
+#setting preplexity = 40
+tsne <- Rtsne(traind[set,-c(1, 31)], perplexity = 40, theta = 0.5,
+pca = F, verbose = T, max_iter = 500, check_duplicates = F)
+library(Rtsne)
+#setting preplexity = 40
+tsne <- Rtsne(traind[set,-c(1, 31)], perplexity = 40, theta = 0.5,
+pca = F, verbose = T, max_iter = 500, check_duplicates = F)
+#setting preplexity = 40
+tsne <- Rtsne(traint[set,-c(1, 31)], perplexity = 40, theta = 0.5,
+pca = F, verbose = T, max_iter = 500, check_duplicates = F)
+set <- 1:as.integer((0.1* nrow(fruad)))
+set <- 1:as.integer((0.1* nrow(traint)))
+#setting preplexity = 40
+tsne <- Rtsne(traint[set,-c(1, 31)], perplexity = 40, theta = 0.5,
+pca = F, verbose = T, max_iter = 500, check_duplicates = F)
+class <- as.factor(fruad$Class[set])
+class <- as.factor(traint$Class[set])
+class <- as.factor(traint$Class[set])
+ggplot(mt, aes(x = V1, y = V2)) +
+geom_point(aes(color = class)) +
+theme_minimal() +
+ggtitle("Transaction VIsualiasation")
+mt <- as.data.frame(tsne$Y)
+ggplot(mt, aes(x = V1, y = V2)) +
+geom_point(aes(color = class)) +
+theme_minimal() +
+ggtitle("Transaction VIsualiasation")
+ggplot(mt, aes(x = traint$Class, y = V2)) +
+geom_point(aes(color = class)) +
+theme_minimal() +
+ggtitle("Transaction VIsualiasation")
+ggplot(mt, aes(x = set, y = V2)) +
+geom_point(aes(color = class)) +
+theme_minimal() +
+ggtitle("Transaction VIsualiasation")
+ggplot(mt, aes(x = V1, y = V2)) +
+geom_point(aes(color = class)) +
+theme_minimal() +
+ggtitle("Transaction VIsualiasation")
+library(doSNOW)
+# have to register < R does not have auto register for dosnow
+cl <- makeCluster(8, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+View(cl)
+model <- neuralnet(Class ~., traint, linear.output = F)
+plot(model)
+pred <- compute(model, testd)
+pred <- compute(model, testd)
+rest <- pred$net.result
+rest <- ifelse(rest > 0.5, 1, 0)
+rest
+pred <- compute(model, testd)
+plot(pred)
+plot(rest)
+plot(rest)
+summary(rest)
+dim(rest)
+mat2 <- confusionMatrix(test2,
+as.numeric(predict(model, testd, type = "response") > 0.5))
+library(CRAN)
+install.packages("CRAN")
+CRAN.packages()
+available.packages(CRAN.packages())
+defunct
+Defunct
+library(CRAN)
+install.packages("CRAN")
+rpart.cv <- function(seed, training, labels, ctrl) {
+cl <- makeCluster(6, type = "SOCK")
+registerDoSNOW(cl)
+set.seed(seed)
+# Leverage formula interface for training
+rpart.cv <- train(x = training, y = labels, method = "rpart", tuneLength = 30,
+trControl = ctrl)
+#Shutdown cluster
+stopCluster(cl)
+return (rpart.cv)
+}
+features <- c("Class", "Amount")
+rpart.t <- traint[, features]
+ctrl.2 <- trainControl(method = "repeatedcv", number = 5, repeats = 10,
+index = cv.5.folds)
+library(caret)
+ctrl.2 <- trainControl(method = "repeatedcv", number = 5, repeats = 10,
+index = cv.5.folds)
+# k = number fo folds, i.e. 5 folds 10 times
+cv.5.folds <- createMultiFolds(rf.label, k = 5, times = 10)
+l.label <- as.factor(traint$Class)
+ctrl.2 <- trainControl(method = "repeatedcv", number = 5, repeats = 10,
+index = cv.5.folds)
+# k = number fo folds, i.e. 5 folds 10 times
+cv.5.folds <- createMultiFolds(l.label, k = 5, times = 10)
+ctrl.2 <- trainControl(method = "repeatedcv", number = 5, repeats = 10,
+index = cv.5.folds)
+# Grab features
+features <- c("Class", "Amount")
+rpart.t <- traint[, features]
+rpart.1 <- rpart.cv(1111, rpart.t l.label, ctrl.2)
+rpart.1 <- rpart.cv(1111, rpart.t, l.label, ctrl.2)
+# using logistic regression
+library(glmnet)
+lm <- glm(Class ~., testd, family = binomial())
+lm <- glm(Class ~., testd, family = binomial(), maxit = 100)
+lm <- glm(Class ~., testd, family = binomial('logit'), maxit = 100)
+summary(lm)
+plot(lm)
+cl <- makeCluster(8, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+ct <- trainControl(method = "cv",
+number = 20,
+verboseIter = T,
+classProbs = T,
+sampling = "smote",
+summaryFunction = twoClassSummary,
+savePredictions = T)
+md1 <- neuralnet(formula = Class ~ ., traint, hidden = 10, threshold = 0.05)
+md1
+plot(nn)
+# testing the model
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, testd, type = "response") > 0.5))
+(md1)
+# testing the model
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, testd, type = "response") > 0.5))
+plot(md1)
+mat3 <- confusionMatrix(eData, as.numeric(predict(md1, testd, type = "response") > 0.5))
+# testing the model
+mat2 <- confusionMatrix(traint, (predict(md1, testd, type = "response") > 0.5))
+# testing the model
+preds <- predict(testd)
+# testing the model
+preds <- predict(md1, testd, type = "prob")
+conf <- confusionMatrix(as.numeric(predsX1 > 0.5), testd)
+?confusionMatrix()
+conf <- confusionMatrix(as.numeric(preds$X1 > 0.5), testd)
+conf <- confusionMatrix(as.numeric(preds> 0.5), testd)
+preds
+summary(preds)
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, testd, type = "response") > 0.5))
+# developing artificial neural nets
+library(neuralnet)
+library(doSNOW)
+library(rpart)
+library(rpart.plot)
+# to increase the performance of our model we delineate ROC curve
+# roc <- Reciever Optimistic Characteristics
+library(pROC)
+library(caTools)
+# Checking the correlation of the variables
+library(corrplot)
+library(Rtsne)
+library(caret)
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, testd, type = "response") > 0.5))
+conf <- confusionMatrix(as.numeric(preds> 0.5), testd)
+mat3 <- confusionMatrix(eData, as.numeric(predict(md1, testd, type = "prob") > 0.5))
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, traint, type = "response") > 0.5))
+mat2 <- confusionMatrix(traint, as.numeric(predict(md1, traint, type = "response") > 0.5))
+mat2 <- confusionMatrix(testd, as.numeric(predict(md1, traint, type = "response") > 0.5))
+mat2 <- confusionMatrix(testd, as.numeric(predict(md1, Class, type = "response") > 0.5))
+mat2 <- confusionMatrix(testd, as.numeric(predict(md1, testd$Class, type = "response") > 0.5))
+mat2 <- confusionMatrix(testd, as.numeric(predict(md1, traint$Class, type = "response") > 0.5))
+md1
+mat2 <- confusionMatrix(testd, as.numeric(predict(md1, nn, type = "response") > 0.5))
+predict <- compute(md1, testd)
+predict$net.result
+prob <- predict$net.result
+pred <- ifelse(prob>0.5, 1, 0)
+pred
+predict$net.result
+predict <- compute(md1, testd)
+summary(predict)
+predict$neurons
+library(doSNOW)
+cl <- makeCluster(6, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+rfModel <- randomForest(Class ~ ., data = train1)
+library(randomForest)
+rfModel <- randomForest(Class ~ ., data = train1)
+set.seed(1111)
+eData$class <- factor(eData$Class)
+train1 <- eData[1:150000, ]
+test <- eData[150001:280000, ]
+rfModel <- randomForest(Class ~ ., data = train1)
+predd <- predict(rfmodel, test)
+predd <- predict(rfModel, test)
+conf <- confusionMatrix(test$class, predd)
+library(caret)
+conf <- confusionMatrix(test$class, predd)
+test$predicted <- predict(rfModel, test)
+conf <- confusionMatrix(test$class, test$predicted)
+test$predicted
+dim(test$class)
+dim(test$predicted)
+summary(test$predicted)
+summary(test$class)
+conf <- confusionMatrix(test$class, test$predicted)
+options(repr.plot.width = 5, repr.plot.height = 4)
+varImpPlot(rfMOdel,
+sort = T,
+n.var = 10,
+main = "TOp 10 important variables")
+varImpPlot(rfModel,
+sort = T,
+n.var = 10,
+main = "TOp 10 important variables")
+library(doSNOW)
+cl <- makeCluster(6, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+# using neural net to make perfected model
+nn <- neuralnet(formula = Class ~ traint$V17 + traint$V12 + traint$V14 + traint$V10 + traint$V16 +
+traint$V11 + traint$V9 + traint$V4 + traint$V18 + traint$V26, data = traint, hidden = 20, threshold = 0.5)
+# developing artificial neural nets
+library(neuralnet)
+# using neural net to make perfected model
+nn <- neuralnet(formula = Class ~ traint$V17 + traint$V12 + traint$V14 + traint$V10 + traint$V16 +
+traint$V11 + traint$V9 + traint$V4 + traint$V18 + traint$V26, data = traint, hidden = 20, threshold = 0.5)
+# using neural net to make perfected model
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = 20, threshold = 0.5)
+# using neural net to make perfected model
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = C(20,4) threshold = 0.5)
+# using neural net to make perfected model
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = C(20,4), threshold = 0.5)
+# using neural net to make perfected model
+set.seed(1103)
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = C(20,4), threshold = 0.5)
+?hidden
+?`neuralnet-package`
+?`neuralnet
+?neuralnet
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = C(10 ,3), threshold = 0.5)
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = c(10 ,3), threshold = 0.5)
+library(doSNOW)
+cl <- makeCluster(6, type = "SOCK")
+# have to register < R does not have auto register for dosnow
+registerDoSNOW(cl)
+# using neural net to make perfected model
+set.seed(1103)
+# using neural net to make perfected model
+set.seed(0311)
+nn <- neuralnet(formula = Class ~ V17 + V12 + V14 + V10 + V16 +
+V11 + V9 + V4 + V18 + V26, data = traint, hidden = c(20 ,5), threshold = 0.5)
+plot(nn)
+predicttt <- compute(nn, testd)
+predicttt$net.result
+summary(predicttt)
+summary(predicttt$net.result)
+result <- predicttt$net.result
+result <- ifelse(result > 0.5, 1, 0)
+result
+prob <- predicttt$net.result
+pred <- ifelse(prob>0.5, 1, 0)
+pred
+predicttt$net.result
+predicted=result$prediction * abs(diff(range(Class))) + min(Class)
+predicted=result * abs(diff(range(Class))) + min(Class)
+predicted=result * abs(diff(range(testd$Class))) + min(testdClass)
+predicted=result * abs(diff(range(testd$Class))) + min(testd$Class)
+accuracy=1-abs(mean(deviation))
+actual=testd$Class  * abs(diff(range(testd$Class))) + min(testd$Class)
+comparison=data.frame(predicted, actual)
+deviation=((actual-predicted)/actual)
+comparison=data.frame(predicted,actual,deviation)
+accuracy=1-abs(mean(deviation))
+accuracy
+plot(nn)
+result
+prob <- predicttt$net.result
+pred
+pred <- ifelse(prob>0.5, 1, 0)
+pred
+predicttt$net.result
+summary(predicttt$net.result)
+tt <- eData[-31]
+tt
+View(tt)
+tt <- eData[-31,]
+View(tt)
+tt <- eData[, -31]
+View(tt)
+tt <- eData(-31)
+set <- 1:as.integer((0.1* nrow(eData)))
+tes <- eData[set, (-30)]
+View(tes)
+tes <- eData[set, (-1)]
+tes <- eData[set, (-1, )]
+set.seed(1345)
+eData$Class <- as.numeric(eData$Class)
+# creating 2 data sets one for training and one for testing
+traindt <- createDataPartition(eData$Class, times = 1, p = 0.8, list = F)
+library(caret)
+library(Rtsne)
+# creating 2 data sets one for training and one for testing
+traindt <- createDataPartition(eData$Class, times = 1, p = 0.8, list = F)
+# creating 2 data sets one for training and one for testing
+traindt <- createDataPartition(eData$Class, times = 1, p = 0.8, list = F)
+set <-1:as.integer((0.1* nrow(fruad)))
+#removing variable time and class
+tss <- eData[set, (-1)]
+tsss <- tss[set, (-30)]
+#not
+class <- as.factor(eData$Class[set])
+ts <- as.data.frame(ts1$Y)
+View(tsss)
+tsss <- tss[set, (-30)]
+tsss <- tss[set, (-30)]
+View(tsss)
+tsss <- tss[set, ("class")]
+tsss <- tsss[set, (-30)]
+tsss <- tss[set, -c(30, 31)]
+View(tsss)
+final <- predict(nn, tsss)
+final1 <- compute(nn, tsss)
+# developing artificial neural nets
+library(neuralnet)
+final1 <- compute(nn, tsss)
+final
+plot(final, set)
+plot(final)
+plot(set)
+plot(set$class)
+confusionMatrix(tsss, eData)
+confusionMatrix(tsss, tss)
+confusionMatrix(tsss, set)
+lm <- glm(Class ~., testd, family = binomial('logit'), maxit = 100)
+summary(lm)
+plot(lm)
+#using heirarchical clustering
+library(cluster)
+fruad <- eData[eData$class == 1,]
+legit <- eData[eData$class == 0, ]
+View(fruad)
+View(legit)
+fruad <- eData[eData$Class == 1,]
+legit <- eData[eData$Class == 0, ]
+legit <- eData[eData$Class == 0]
+View(legit)
+legit <- eData[eData$Class == 0, ]
+legit <- eData[eData$class == 0, ]
+legit <- eData[eData$class == 0 ]
+legit <- eData[eData$class == 31 ]
+legit <- eData[eData$class == 31 ]
+legit <- eData[eData == 31 ]
+legit <- eData[eData == 30]
+View(legit)
+library(cluster)
+clusr <- hclust(eData)
+set <-1:as.integer((0.1* nrow(eData)))
+#removing variable time and class
+tss <- eData[set, (-1)]
+tsss <- tss[set, -c(30, 31)]
+clus <- hclust(tsss)
+clus <- hclust(tsss, na.rm = T)
+is.na(tsss)
+any(is.na(tsss))
+clus <- hclust(tsss)
+tss1 <- 1:as.integer((0.1* nrow(eData)))
+clus <- hclust(tss1)
